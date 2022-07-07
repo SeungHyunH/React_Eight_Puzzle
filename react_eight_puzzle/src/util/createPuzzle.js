@@ -34,8 +34,6 @@ export default function createPuzzle(SIZE){
             }
         }
     
-        console.log(inversionCount,yPosition,puzzle);
-    
         if(SIZE%2===1){
             if(inversionCount%2===0){result=true;}
         }else{
@@ -54,6 +52,5 @@ export default function createPuzzle(SIZE){
     while(!isValid()){
         createRandomPuzzle();
     }
-    console.log(puzzle);
     return puzzle;
 }
