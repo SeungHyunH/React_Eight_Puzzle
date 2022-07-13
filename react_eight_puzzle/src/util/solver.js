@@ -1,7 +1,6 @@
 import PriorityQueue from './priorityQueue';
 export default function solver (init)
 {   
-    console.log('start',init);
     const ROW = init.length;
     const COL = init[0].length;
     const ANSWER = Array.from(Array(ROW*ROW),(_,idx)=>idx === ROW*ROW-1 ? 0 : idx+1);
@@ -83,13 +82,13 @@ export default function solver (init)
     }
     const path = [];
     let temp = visited[ANSWER_TEXT];
-    if(temp === undefined){console.log('error');}
+    if(temp === undefined){return null;}
     else{
         while(temp.parent !== null){
             path.push(temp.data.join(''));
             temp = temp.parent;
         }
         path.push(initData.join(''));
-        console.log('end',path);
+        return path;
     }
 }

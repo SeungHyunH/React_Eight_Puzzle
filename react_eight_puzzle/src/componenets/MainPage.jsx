@@ -10,6 +10,9 @@ const MainPage = () => {
   const puzzle = useRef([]);
   const currentPos = useRef([0,0]);
   const answer = useRef([]);
+  const time = useRef({start: 0, elapsed: 0});
+  const path = useRef();
+  const pathIndex = useRef(-1);
   useEffect(()=>{
     puzzle.current = createPuzzle(puzzleLength);
     answer.current = Array.from(Array(puzzleLength),()=>Array(puzzleLength).fill(0));
@@ -117,10 +120,64 @@ const MainPage = () => {
         break;
     }
   }
+
+  const animate = (now = 0)=>{
+    if(pathIndex.current<0){
+      alert('골인! 원래대로 배치합니다');
+      const ctx = canvas.current.getContext("2d");
+      for(let i = 0; i < puzzleLength ; i++){
+        for(let j = 0; j < puzzleLength; j++){
+          ctx.fillStyle='#FFC0CB';
+          ctx.fillRect(j*PUZZLE_SIZE.current+1,i*PUZZLE_SIZE.current+1,PUZZLE_SIZE.current-2,PUZZLE_SIZE.current-2);
+          ctx.strokeRect(j*PUZZLE_SIZE.current+0.5,i*PUZZLE_SIZE.current+0.5,PUZZLE_SIZE.current-1,PUZZLE_SIZE.current-1);
+          ctx.fillStyle='#000000';
+          ctx.fillText(`${puzzle.current[i][j]}`,j*PUZZLE_SIZE.current+Math.floor(PUZZLE_SIZE.current/2),i*PUZZLE_SIZE.current+Math.floor(PUZZLE_SIZE.current*0.8));
+          if(puzzle.current[i][j]===0){
+            currentPos.current[0]=i;
+            currentPos.current[1]=j;
+            ctx.fillStyle='#D3D3D3';
+            ctx.fillRect(j*PUZZLE_SIZE.current+1,i*PUZZLE_SIZE.current+1,PUZZLE_SIZE.current-2,PUZZLE_SIZE.current-2);
+          }
+        }
+      }
+      return;
+    }
+    // 지난 시간을 업데이트한다.
+    time.current.elapsed = now - time.current.start;
+    // 지난 시간이 현재 레벨의 시간을 초과했는지 확인한다.
+    if (time.current.elapsed > 1000) {
+      // 현재 시간을 다시 측정한다.
+      time.current.start = now;
+
+      const ctx = canvas.current.getContext("2d");
+      for(let i = 0; i < puzzleLength*puzzleLength; i++){
+        const ty = i/puzzleLength>>0;
+        const tx = i%puzzleLength;
+        ctx.fillStyle='#FFC0CB';
+        ctx.fillRect(tx*PUZZLE_SIZE.current+1,ty*PUZZLE_SIZE.current+1,PUZZLE_SIZE.current-2,PUZZLE_SIZE.current-2);
+        ctx.strokeRect(tx*PUZZLE_SIZE.current+0.5,ty*PUZZLE_SIZE.current+0.5,PUZZLE_SIZE.current-1,PUZZLE_SIZE.current-1);
+        ctx.fillStyle='#000000';
+        ctx.fillText(`${path.current[pathIndex.current][i]}`,tx*PUZZLE_SIZE.current+Math.floor(PUZZLE_SIZE.current/2),ty*PUZZLE_SIZE.current+Math.floor(PUZZLE_SIZE.current*0.8));
+        if(path.current[pathIndex.current][i]==='0'){
+          ctx.fillStyle='#D3D3D3';
+          ctx.fillRect(tx*PUZZLE_SIZE.current+1,ty*PUZZLE_SIZE.current+1,PUZZLE_SIZE.current-2,PUZZLE_SIZE.current-2);
+        }
+      }
+      pathIndex.current-=1;
+    }
+    requestAnimationFrame(animate);
+  }
+
+  const AutoPlay = () =>{
+    path.current = solver(puzzle.current);
+    pathIndex.current = path.current.length-1;
+    animate();
+  }
+
   return (
     <Wrap tabIndex="0" onKeyDown={(e) => MovePuzzle(e)}>
       <canvas ref={canvas}/>
-      <button onClick={()=>solver(puzzle.current)}>Test</button>
+      <button onClick={AutoPlay}>Test</button>
     </Wrap>
   )
 }
