@@ -1,5 +1,6 @@
 import React,{useRef,useEffect,useState} from 'react'
 import createPuzzle from '../util/createPuzzle';
+import solver from '../util/solver';
 import styled from 'styled-components';
 const MainPage = () => {
   const canvas = useRef(null);
@@ -119,6 +120,7 @@ const MainPage = () => {
   return (
     <Wrap tabIndex="0" onKeyDown={(e) => MovePuzzle(e)}>
       <canvas ref={canvas}/>
+      <button onClick={()=>solver(puzzle.current)}>Test</button>
     </Wrap>
   )
 }
