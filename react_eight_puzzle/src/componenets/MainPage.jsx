@@ -5,6 +5,7 @@ import styled from 'styled-components';
 const MainPage = () => {
   const canvas = useRef(null);
   const [puzzleLength,setPuzzleLength] = useState(3);
+  const [moveCount,setMoveCount] = useState(0);
   const PUZZLE_SIZE = useRef(1);
   const fontSize = useRef(16);
   const puzzle = useRef([]);
@@ -22,7 +23,7 @@ const MainPage = () => {
       }
     }
     answer.current[puzzleLength-1][puzzleLength-1] = 0;
-    PUZZLE_SIZE.current = Math.floor((document.documentElement.clientWidth/3)/puzzleLength);
+    PUZZLE_SIZE.current = Math.floor((document.documentElement.clientWidth/2.5)/puzzleLength);
     const ctx = canvas.current.getContext("2d");
     ctx.canvas.width = PUZZLE_SIZE.current*puzzleLength+2;
     ctx.canvas.height = PUZZLE_SIZE.current*puzzleLength+2;
@@ -71,6 +72,7 @@ const MainPage = () => {
           puzzle.current[currentPos.current[0]][currentPos.current[1]] = puzzle.current[currentPos.current[0]][currentPos.current[1]-1];
           puzzle.current[currentPos.current[0]][currentPos.current[1]-1]= 0;
           currentPos.current[1] -=1;
+          setMoveCount(moveCount+1);
           if(CheckAnswer()){alert('정답');}
         }
         break;
@@ -85,6 +87,7 @@ const MainPage = () => {
           puzzle.current[currentPos.current[0]][currentPos.current[1]] = puzzle.current[currentPos.current[0]][currentPos.current[1]+1];
           puzzle.current[currentPos.current[0]][currentPos.current[1]+1]= 0;
           currentPos.current[1] +=1;
+          setMoveCount(moveCount+1);
           if(CheckAnswer()){alert('정답');}
         }
         break;
@@ -99,6 +102,7 @@ const MainPage = () => {
           puzzle.current[currentPos.current[0]][currentPos.current[1]] = puzzle.current[currentPos.current[0]-1][currentPos.current[1]];
           puzzle.current[currentPos.current[0]-1][currentPos.current[1]]= 0;
           currentPos.current[0] -=1;
+          setMoveCount(moveCount+1);
           if(CheckAnswer()){alert('정답');}
         }
         break;
@@ -113,6 +117,7 @@ const MainPage = () => {
           puzzle.current[currentPos.current[0]][currentPos.current[1]] = puzzle.current[currentPos.current[0]+1][currentPos.current[1]];
           puzzle.current[currentPos.current[0]+1][currentPos.current[1]]= 0;
           currentPos.current[0] +=1;
+          setMoveCount(moveCount+1);
           if(CheckAnswer()){alert('정답');}
         }
         break;
@@ -176,8 +181,11 @@ const MainPage = () => {
 
   return (
     <Wrap tabIndex="0" onKeyDown={(e) => MovePuzzle(e)}>
-      <canvas ref={canvas}/>
-      <button onClick={AutoPlay}>Test</button>
+      <MainContainer><canvas ref={canvas}/></MainContainer>
+      <SideConainer>
+        <Counter>움직인 횟수 : {moveCount}</Counter>
+        <Button onClick={AutoPlay}>AutoPlay</Button>
+      </SideConainer>
     </Wrap>
   )
 }
@@ -185,7 +193,33 @@ const MainPage = () => {
 const Wrap = styled.div`
   width : 100vw;
   height : 100vh;
+  display: flex;
+  flex-direction: row;
   :focus{outline: none;}
+`
+
+const MainContainer = styled.div`
+  width: 75%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
+const SideConainer = styled.div`
+  width: 25%;
+  padding-top: 5%;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+`
+const Counter = styled.div`
+  width: 12rem;
+  height: 3rem;
+`
+
+const Button = styled.button`
+  width: 12rem;
+  height: 3rem;
 `
 
 export default MainPage
